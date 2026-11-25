@@ -1,6 +1,7 @@
 // 計算ロジック（GAS版からそのまま移植・テスト済み）と初期データ
 // pointInfo / calcProfit / checkWarn は外部の状態を参照しない純粋関数
 
+export const CATEGORIES = ['家電', 'おもちゃ', 'ゲーム', '本', '衣類', '美容', '日用品', '食品', '工具', 'その他'];
 export const CHANNELS = ['メルカリ', 'ヤフオク', 'BASE', 'Amazon'];
 export const STATUSES = ['検討中', '購入済', '出品中', '売却済', '見送り'];
 export const CAMP_TYPES = ['毎日', '毎月の日付', '曜日', '期間'];
@@ -9,8 +10,9 @@ export const DEFAULT_SETTINGS = {
   mercariRate: 0.10, yahooRate: 0.10, basePayRate: 0.036, basePayFixed: 40, baseServiceRate: 0.03,
   amazonReferralRate: 0.10, amazonReferralMin: 30, amazonFbaFee: 450, amazonMonthlyPerItem: 50, amazonInboundPerItem: 60,
   packingCost: 30, defaultCostShipping: 600, minProfit: 500, minMargin: 0.15, minMonthlySold: 3,
-  marketFreshDays: 60, monthlyBudget: 50000, maxPerItem: 2,
+  marketFreshDays: 60, monthlyBudget: 50000, maxPerItem: 2, stockAlertDays: 30,
   rakutenAppId: '', rakutenAccessKey: '', rakutenReferer: '', yahooAppId: '', keepaKey: '', geminiKey: '', groqKey: '', groqModel: '', aiEndpoint: '/api/ai',
+  supabaseUrl: '', supabaseAnonKey: '', shareMarket: false, shareNick: '', region: '',
 };
 export const SETTING_LABELS = {
   mercariRate: 'メルカリ販売手数料率', yahooRate: 'ヤフオク落札システム利用料率（LYPプレミアムなら0.088）',
@@ -18,7 +20,7 @@ export const SETTING_LABELS = {
   amazonReferralRate: 'Amazon販売手数料率', amazonReferralMin: 'Amazon販売手数料の最低額（円）', amazonFbaFee: 'FBA配送代行手数料（円）',
   amazonMonthlyPerItem: '大口月額の1個あたり按分（円）', amazonInboundPerItem: 'FBA納品送料 1個あたり（円）', packingCost: '梱包資材費 1個あたり（円）',
   defaultCostShipping: '「送料別」商品に足す仕入送料（円）', minProfit: '◎買いの最低利益（円）', minMargin: '◎買いの最低利益率',
-  minMonthlySold: '月間販売数がこれ未満なら売れ行き注意', marketFreshDays: '相場の鮮度（日）', monthlyBudget: '月の仕入予算（円）', maxPerItem: '1商品あたりの最大仕入数',
+  minMonthlySold: '月間販売数がこれ未満なら売れ行き注意', marketFreshDays: '相場の鮮度（日）', monthlyBudget: '月の仕入予算（円）', maxPerItem: '1商品あたりの最大仕入数', stockAlertDays: '在庫アラート（仕入れから何日で値下げ検討）',
 };
 
 export const DEFAULT_SHIP = [
@@ -83,6 +85,8 @@ export const DEFAULT_SITES = [
   { show: true, group: '中古', name: '駿河屋', url: 'https://www.suruga-ya.jp/search?search_word={q}', note: '' },
   { show: true, group: '卸', name: 'NETSEA', url: 'https://www.netsea.jp/search?keyword={q}', note: '' },
   { show: true, group: '卸', name: 'スーパーデリバリー', url: 'https://www.google.com/search?q={q}+site%3Asuperdelivery.com', note: 'G' },
+  { show: true, group: '需要・季節', name: 'Googleトレンド', url: 'https://trends.google.co.jp/trends/explore?geo=JP&q={q}', note: '検索数の推移' },
+  { show: true, group: '需要・季節', name: 'Google 直近1か月', url: 'https://www.google.com/search?q={q}&tbs=qdr:m', note: '新型・話題' },
   { show: true, group: 'SNS', name: 'X', url: 'https://x.com/search?q={q}&f=live', note: '' },
   { show: true, group: 'SNS', name: 'X 「売れた」', url: 'https://x.com/search?q={q}%20%E5%A3%B2%E3%82%8C%E3%81%9F&f=live', note: '' },
   { show: true, group: 'SNS', name: 'Instagram', url: 'https://www.instagram.com/explore/search/keyword/?q={q}', note: '' },

@@ -13,6 +13,12 @@ const PROMPTS = {
 JSONだけを返してください（前後に文章を付けない）:
 {"name":"商品名（メーカー・シリーズ・型番まで）","model":"型番","jan":"JANが写っていれば13桁、なければ空","category":"カテゴリ","condition":"新品/中古/不明","keywords":["検索に使う短いキーワード1","2"],"notes":"せどり目線の注意点（偽物・規制・付属品・版違いなど）","confidence":0.0}
 不明な項目は空文字にする。推測した型番には末尾に「?」を付ける。`,
+  shelf: `あなたは日本のせどり（店舗仕入れ）の専門家です。画像は店頭で撮った「商品と値札」です。商品の特定と、値札の価格を同時に読み取ってください。
+JSONだけを返してください（前後に文章を付けない）:
+{"name":"商品名（メーカー・シリーズ・型番まで）","model":"型番","jan":"JANが写っていれば13桁、なければ空","category":"カテゴリ（家電/おもちゃ/ゲーム/本/衣類/美容/日用品/食品/工具/その他）","condition":"新品/中古/不明","price":値札の税込価格の数値（読めなければ0）,"priceNote":"値札の補足（税抜表記・割引・セール・まとめ価格など）","store":"写っていれば店名","notes":"せどり目線の注意点（付属品・状態・規制・偽物）","confidence":0.0}
+税抜と書いてあれば税込に直して price に入れ、priceNote にその旨を書く。`,
+  markdown_price: `画像は値下げ・セールの値札やPOPです。元値・値引後の価格・条件（期間・会員・まとめ買い）をJSONだけで: {"price":数値,"original":数値,"cond":"条件","note":"補足"}`,
+  repricing: `あなたは慎重なせどりアドバイザーです。売れ残っている在庫について、値下げ・販路変更・損切りのどれが良いかを日本語で3文以内で提案し、具体的な提案価格を1つ示してください。数字は与えられたものから計算し、損切りライン（実質仕入値）を下回る提案は「損切り」と明記する。`,
   read_market: `画像はフリマ・オークション・SNSのスクリーンショットです。売れた実績を読み取ってください。
 JSONだけを返してください:
 {"source":"メルカリ/ヤフオク/ラクマ/Amazon/X/Instagram/その他","prices":[売れた価格の数値...],"median":中央値の数値,"soldCount":読み取れた売れた件数,"period":"読み取れる期間の目安","demand":"高/中/低","notes":"相場の傾向・状態差・注意点を2文以内"}
@@ -119,12 +125,14 @@ async function viaRelay(task, { text, imageDataUrl }, endpoint, settings) {
 
 function mock(task) {
   const m = {
+    shelf: { name: 'サンプル加湿器 ハイブリッド式 HD-RX100', model: 'HD-RX100', jan: '', category: '家電', condition: '中古', price: 4980, priceNote: '税込表記', store: 'セカンドストリート', notes: '付属フィルターの有無を確認', confidence: 0.8 },
+    repricing: '仕入れから35日で相場より8%高い設定なので、まず9,800円へ値下げして1週間様子を見るのが良いです。それでも動かなければヤフオクで即決8,500円に販路変更。損切りラインは実質仕入値6,980円です。',
     identify: { name: 'サンプル加湿器 ハイブリッド式 HD-RX100', model: 'HD-RX100', jan: '4901234567894', category: '生活家電', condition: '不明', keywords: ['HD-RX100', 'サンプル 加湿器'], notes: '型番は箱の表記から。付属フィルターの有無を確認', confidence: 0.8 },
     read_market: { source: 'メルカリ', prices: [9800, 11000, 10500, 12800, 9500], median: 10500, soldCount: 5, period: '直近1か月', demand: '中', notes: '未使用品は12,000円前後、使用済みは9,500〜10,500円。箱なしは安い' },
     explain: '利益率25%で基準を満たし、月販10件なら2週間以内に売れる見込みです。中古は状態差で相場が2,000円ほど動くので、付属品とフィルターの有無を確認してから仕入れてください。注意：同型の新モデルが出ると相場が下がります。',
     listing: { title: 'サンプル加湿器 ハイブリッド式 HD-RX100 動作確認済', body: '動作確認済みのハイブリッド式加湿器です。付属品：本体、電源コード、取扱説明書。使用に伴う小傷があります。写真でご確認ください。発送は宅急便80サイズ、簡易梱包です。' },
   };
-  return new Promise((ok) => setTimeout(() => ok(task === 'explain' ? m.explain : JSON.stringify(m[task])), 600));
+  return new Promise((ok) => setTimeout(() => ok(typeof m[task] === 'string' ? m[task] : JSON.stringify(m[task])), 600));
 }
 
 // 使える経路を順番に返す（表示用にも使う）
@@ -153,7 +161,7 @@ export async function ask(task, payload, settings) {
       else if (route === 'groq') text = await viaGroq(task, payload, s.groqKey, s.groqModel);
       else if (route === 'artifact') text = await viaArtifact(task, payload);
       else text = await viaRelay(task, payload, s.aiEndpoint, s);
-      return task === 'explain' ? String(text).trim() : parseJson(text);
+      return (task === 'explain' || task === 'repricing') ? String(text).trim() : parseJson(text);
     } catch (e) {
       errs.push((ROUTE_LABEL[route] || route) + '：' + (e && e.message || e));
       // 枠切れ・通信エラー・解析失敗はすべて次の経路へ
