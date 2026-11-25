@@ -1,0 +1,16 @@
+{
+  "name": "セドリサーチ",
+  "short_name": "セドリサーチ",
+  "description": "写真・バーコードから商品を特定し、売れた相場と手数料込みの利益で仕入れを判定するリサーチアプリ",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6f3ef",
+  "theme_color": "#e0703a",
+  "lang": "ja",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

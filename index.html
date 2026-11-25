@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#e0703a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="セドリサーチ">
+<title>セドリサーチ</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="status" class="status"><span class="spin"></span><span id="statusText">読み込み中…</span></div>
+<main id="view"></main>
+<nav id="nav">
+  <button data-t="home"><span class="ic">⌂</span>ホーム</button>
+  <button data-t="search" class="on"><span class="ic">🔍</span>調べる</button>
+  <button data-t="judge"><span class="ic">¥</span>判定</button>
+  <button data-t="stock"><span class="ic">📦</span>在庫・実績</button>
+  <button data-t="settings"><span class="ic">⚙</span>設定</button>
+</nav>
+
+<!-- カメラのライブ読み取り -->
+<div id="scan" class="scan">
+  <video id="scan_v" playsinline muted autoplay></video>
+  <div class="guide"></div>
+  <div class="bar"><span id="scan_msg">カメラを起動中…</span><button class="btn sm ghost" id="scan_close">閉じる</button></div>
+</div>
+<input type="file" id="file_barcode" accept="image/*" capture="environment" hidden>
+<input type="file" id="file_photo" accept="image/*" capture="environment" hidden>
+<input type="file" id="file_shot" accept="image/*" hidden>
+<input type="file" id="file_import" accept="application/json" hidden>
+<div id="toast" class="toast"></div>
+<div id="sheet" class="sheet"><div class="sheet-in"><div class="sheet-h"><b id="sheet_title"></b><button class="btn sm ghost" id="sheet_close">閉じる</button></div><div id="sheet_body"></div></div></div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
