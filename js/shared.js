@@ -10,7 +10,8 @@ export function enabled(s) { return !!conf(s); }
 
 async function rest(s, path, { method = 'GET', body, prefer } = {}) {
   const c = conf(s); if (!c) throw new Error('共有は未設定（設定でSupabaseのURLとキーを入れてください）');
-  const h = { apikey: c.key, Authorization: 'Bearer ' + c.key, 'Content-Type': 'application/json' };
+  const h = { apikey: c.key, 'Content-Type': 'application/json' };
+  if (!/^sb_/.test(c.key)) h.Authorization = 'Bearer ' + c.key; // 旧式の anon JWT の時だけ
   if (prefer) h.Prefer = prefer;
   const r = await fetch(`${c.url}/rest/v1/${path}`, { method, headers: h, body: body ? JSON.stringify(body) : undefined });
   if (!r.ok) { let m = ''; try { m = (await r.json()).message || ''; } catch (e) { /* noop */ } throw new Error(`共有サーバー ${r.status}${m ? ': ' + m.slice(0, 100) : ''}`); }

@@ -12,7 +12,8 @@ export const DEFAULT_SETTINGS = {
   packingCost: 30, defaultCostShipping: 600, minProfit: 500, minMargin: 0.15, minMonthlySold: 3,
   marketFreshDays: 60, monthlyBudget: 50000, maxPerItem: 2, stockAlertDays: 30,
   rakutenAppId: '', rakutenAccessKey: '', rakutenReferer: '', yahooAppId: '', keepaKey: '', geminiKey: '', groqKey: '', groqModel: '', aiEndpoint: '/api/ai',
-  supabaseUrl: '', supabaseAnonKey: '', shareMarket: false, shareNick: '', region: '',
+  // 共有DB（運営のSupabase）。publishable キーは公開前提のキーで、RLS により読み取りと追加しかできない
+  supabaseUrl: 'https://iugxomihhdybqwcoccpg.supabase.co', supabaseAnonKey: 'sb_publishable_h9JwyIBE4XPtX0RI2vOmEg_xSFNyKxQ', shareMarket: true, shareNick: '', region: '',
 };
 export const SETTING_LABELS = {
   mercariRate: 'メルカリ販売手数料率', yahooRate: 'ヤフオク落札システム利用料率（LYPプレミアムなら0.088）',

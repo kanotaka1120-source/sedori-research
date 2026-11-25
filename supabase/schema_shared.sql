@@ -42,3 +42,9 @@ create policy "insert anon" on sale_calendar for insert with check (true);
 
 -- 1時間に同じ anon からの大量投稿を抑える簡易策（Supabase 側の API レート制限も併用）
 -- 必要になったら: create policy ... with check (( select count(*) from market_shared where created_at > now() - interval '1 hour') < 5000);
+
+-- 新しいプロジェクトは API からの権限が自動では付かないので明示的に付与する
+grant usage on schema public to anon, authenticated;
+grant select, insert on market_shared to anon, authenticated;
+grant select, insert on sale_calendar to anon, authenticated;
+grant usage, select on sequence market_shared_id_seq, sale_calendar_id_seq to anon, authenticated;

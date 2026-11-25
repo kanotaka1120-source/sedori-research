@@ -466,7 +466,7 @@ function viewSettings() {
       <label>楽天 アプリID</label><input data-k="rakutenAppId" value="${esc(s.rakutenAppId)}"><label>楽天 アクセスキー</label><input data-k="rakutenAccessKey" value="${esc(s.rakutenAccessKey)}"><label>Yahoo! Client ID</label><input data-k="yahooAppId" value="${esc(s.yahooAppId)}"><label>Keepa APIキー</label><input data-k="keepaKey" value="${esc(s.keepaKey)}"><label>AI中継URL</label><input data-k="aiEndpoint" value="${esc(s.aiEndpoint)}">
       <div class="muted" style="margin-top:6px">楽天・Yahoo!の自動検索は、中継サーバー（Vercel）を置いてから有効になります。</div><button class="btn block" id="api_save">保存</button></div>
     <div class="card"><h2>共有（みんなの相場DB・セールカレンダー）</h2>
-      <div class="muted">${shared.enabled(s) ? '接続先あり' : '未接続'}。相場は「JAN／商品名・販売先・価格」だけを匿名で共有します。個人情報・仕入値は送りません。</div>
+      <div class="muted">${shared.enabled(s) ? '運営の共有DBに接続済み（初期設定のまま使えます）' : '未接続'}。相場は「JAN／商品名・販売先・価格」だけを匿名で共有します。個人情報・仕入値は送りません。自前のSupabaseに切り替える時だけ下を書き換えてください。</div>
       <label>Supabase URL</label><input data-k="supabaseUrl" value="${esc(s.supabaseUrl)}" placeholder="https://xxxx.supabase.co" autocomplete="off">
       <label>Supabase anon key</label><input data-k="supabaseAnonKey" value="${esc(s.supabaseAnonKey)}" placeholder="eyJ…" autocomplete="off">
       <div class="row"><div><label>ニックネーム（任意）</label><input data-k="shareNick" value="${esc(s.shareNick)}"></div><div><label>地域（都道府県）</label><input data-k="region" value="${esc(s.region)}" placeholder="栃木"></div></div>

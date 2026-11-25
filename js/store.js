@@ -42,6 +42,13 @@ export async function loadConfig() {
     const row = await get('kv', k);
     const v = row ? row.value : null;
     cache[k] = k === 'settings' ? Object.assign({}, KV_DEFAULTS.settings, v || {}) : (v || JSON.parse(JSON.stringify(KV_DEFAULTS[k])));
+    if (k === 'settings') { // 空のままの接続先は初期値（運営の共有DB）に戻す
+      ['supabaseUrl', 'supabaseAnonKey'].forEach((key) => { if (!cache.settings[key]) cache.settings[key] = KV_DEFAULTS.settings[key]; });
+    }
+    if (k === 'sites' && v) { // 新しく増えた検索先を既存ユーザーにも追加
+      const names = new Set(cache.sites.map((x) => x.name));
+      KV_DEFAULTS.sites.forEach((d, i) => { if (!names.has(d.name)) cache.sites.splice(Math.min(i, cache.sites.length), 0, JSON.parse(JSON.stringify(d))); });
+    }
   }
   return config();
 }
